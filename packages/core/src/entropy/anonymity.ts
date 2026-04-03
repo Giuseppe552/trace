@@ -90,6 +90,14 @@ export interface EvidenceItem {
   confidence: number
 }
 
+/** A collector that was expected to run but failed */
+export interface FailedCollector {
+  source: string
+  reason: string
+  /** maximum information this collector COULD have contributed */
+  maxPotentialBits: number
+}
+
 /** Result of anonymity computation */
 export interface AnonymityAssessment {
   /** starting anonymity in bits (from population prior) */
@@ -98,14 +106,28 @@ export interface AnonymityAssessment {
   totalGainBits: number
   /** remaining anonymity in bits */
   remainingBits: number
-  /** effective anonymity set size */
+  /**
+   * Upper bound on remaining anonymity.
+   * Accounts for failed collectors: if they had found maximum evidence,
+   * remaining could be this much lower. If they found nothing, remaining
+   * stays at remainingBits. The interval [remainingBits, remainingUpper]
+   * represents the uncertainty from missing data.
+   */
+  remainingUpper: number
+  /** effective anonymity set size (from remainingBits) */
   anonymitySet: number
+  /** upper bound anonymity set (from remainingUpper — worst case) */
+  anonymitySetUpper: number
   /** population used as baseline */
   population: number
   /** per-source breakdown, sorted by contribution */
   breakdown: EvidenceItem[]
+  /** collectors that failed to run */
+  failedCollectors: FailedCollector[]
   /** is the subject effectively identified? (remaining < 1 bit) */
   identified: boolean
+  /** can we be confident in this assessment? (no failed collectors) */
+  complete: boolean
 }
 
 /**
@@ -123,10 +145,20 @@ export interface AnonymityAssessment {
  * assumes independent evidence (which overestimates information gain,
  * i.e. underestimates remaining anonymity — conservative for the
  * defender, which is the right direction).
+ *
+ * Failed collectors are tracked separately. A failed collector does
+ * NOT contribute zero — it contributes UNKNOWN. The upper bound on
+ * remaining anonymity equals the result without the failed collectors.
+ * The lower bound accounts for the maximum those collectors could
+ * have contributed. This interval is reported in the output.
+ *
+ * Reference: Shafer (1976) — vacuous belief function m(Θ)=1
+ * represents complete ignorance from a source.
  */
 export function computeAnonymity(
   population: number,
   evidence: EvidenceItem[],
+  failedCollectors: FailedCollector[] = [],
 ): AnonymityAssessment {
   const priorBits = priorAnonymity(population)
 
@@ -139,6 +171,28 @@ export function computeAnonymity(
   const remainingBits = Math.max(0, priorBits - totalGainBits)
   const anonymitySet = anonymitySetSize(remainingBits)
 
+  // upper bound: failed collectors might have contributed nothing
+  // (they might have found no evidence even if they ran)
+  // so the upper bound on remaining is just remainingBits itself
+  //
+  // but we ALSO need to acknowledge that the failed collectors
+  // COULD have found evidence that would narrow further.
+  // remainingBits is already the "without failed collectors" number.
+  // the true remaining could be lower if those collectors had run.
+  //
+  // so: remainingBits is the UPPER bound (worst case for the investigator)
+  // and remainingBits minus max potential of failed collectors is a
+  // LOWER bound (best case — probably unrealistic)
+  const maxMissedBits = failedCollectors.reduce(
+    (sum, fc) => sum + fc.maxPotentialBits,
+    0,
+  )
+  // upper = what we have (no failed collector data)
+  // the actual remaining is somewhere in [remainingBits - maxMissedBits, remainingBits]
+  // report the conservative (higher) number as the primary result
+  const remainingUpper = remainingBits
+  const anonymitySetUpper = anonymitySetSize(remainingUpper)
+
   const breakdown = [...evidence].sort(
     (a, b) => b.informationGain * b.confidence - a.informationGain * a.confidence,
   )
@@ -147,10 +201,14 @@ export function computeAnonymity(
     priorBits,
     totalGainBits,
     remainingBits,
+    remainingUpper,
     anonymitySet,
+    anonymitySetUpper,
     population,
     breakdown,
+    failedCollectors,
     identified: remainingBits < 1,
+    complete: failedCollectors.length === 0,
   }
 }
 

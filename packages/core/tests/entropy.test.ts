@@ -121,6 +121,8 @@ describe('computeAnonymity', () => {
     const result = computeAnonymity(POPULATION.uk, [])
     expect(result.remainingBits).toBeCloseTo(priorAnonymity(POPULATION.uk), 5)
     expect(result.identified).toBe(false)
+    expect(result.complete).toBe(true)
+    expect(result.failedCollectors.length).toBe(0)
   })
 
   it('enough evidence = identified', () => {
@@ -161,5 +163,51 @@ describe('computeAnonymity', () => {
     expect(result.breakdown[0].source).toBe('big')
     expect(result.breakdown[1].source).toBe('medium')
     expect(result.breakdown[2].source).toBe('small')
+  })
+
+  it('failed collectors tracked separately', () => {
+    const result = computeAnonymity(POPULATION.uk, [
+      { source: 'whois', observation: 'email match', informationGain: 20, confidence: 0.9 },
+    ], [
+      { source: 'dns', reason: 'timeout', maxPotentialBits: 8.0 },
+      { source: 'ct', reason: 'crt.sh unavailable', maxPotentialBits: 6.0 },
+    ])
+    expect(result.failedCollectors.length).toBe(2)
+    expect(result.complete).toBe(false)
+    expect(result.failedCollectors[0].source).toBe('dns')
+  })
+
+  it('failed collectors do not contribute to information gain', () => {
+    const withFailed = computeAnonymity(POPULATION.uk, [
+      { source: 'whois', observation: 'match', informationGain: 10, confidence: 1 },
+    ], [
+      { source: 'dns', reason: 'failed', maxPotentialBits: 8.0 },
+    ])
+    const withoutFailed = computeAnonymity(POPULATION.uk, [
+      { source: 'whois', observation: 'match', informationGain: 10, confidence: 1 },
+    ])
+    // remaining bits should be the same — failed collectors add zero
+    expect(withFailed.remainingBits).toBe(withoutFailed.remainingBits)
+    // but completeness differs
+    expect(withFailed.complete).toBe(false)
+    expect(withoutFailed.complete).toBe(true)
+  })
+
+  it('remainingUpper equals remainingBits', () => {
+    const result = computeAnonymity(POPULATION.uk, [
+      { source: 'a', observation: 'x', informationGain: 5, confidence: 1 },
+    ], [
+      { source: 'b', reason: 'failed', maxPotentialBits: 10 },
+    ])
+    // upper bound is the conservative estimate (without failed collector data)
+    expect(result.remainingUpper).toBe(result.remainingBits)
+  })
+
+  it('no failed collectors = complete assessment', () => {
+    const result = computeAnonymity(1000, [
+      { source: 'a', observation: 'x', informationGain: 5, confidence: 1 },
+    ])
+    expect(result.complete).toBe(true)
+    expect(result.failedCollectors.length).toBe(0)
   })
 })

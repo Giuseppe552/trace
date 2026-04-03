@@ -32,6 +32,7 @@ import {
   toDot,
   toD3Json,
   type EvidenceItem,
+  type FailedCollector,
   type AnonymityAssessment,
   type FusedAttribution,
   type EvidenceChain,
@@ -101,6 +102,7 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
   const startedAt = new Date().toISOString()
   const chain = createChain(target.label, 'trace-cli')
   const allSignals: Signal[] = []
+  const failedCollectors: FailedCollector[] = []
   const collectors: InvestigationResult['collectors'] = {}
   const discoveredDomains: string[] = []
 
@@ -128,6 +130,8 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
         description: `DNS records for ${target.domain}`,
         layer: 'dns',
       })
+    } else {
+      failedCollectors.push({ source: 'dns', reason: dnsResult.status === 'rejected' ? String(dnsResult.reason) : 'unknown', maxPotentialBits: 8.0 })
     }
 
     if (ctResult.status === 'fulfilled') {
@@ -148,6 +152,8 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
       })
       // add related domains from CT to discovered list
       discoveredDomains.push(...r.data.relatedDomains)
+    } else {
+      failedCollectors.push({ source: 'ct', reason: ctResult.status === 'rejected' ? String(ctResult.reason) : 'unknown', maxPotentialBits: 6.0 })
     }
 
     if (headersResult.status === 'fulfilled') {
@@ -165,6 +171,8 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
         description: `HTTP headers for ${target.domain}: platform=${r.data.platform}`,
         layer: 'headers',
       })
+    } else {
+      failedCollectors.push({ source: 'headers', reason: headersResult.status === 'rejected' ? String(headersResult.reason) : 'unknown', maxPotentialBits: 20.0 })
     }
 
     if (whoisResult.status === 'fulfilled') {
@@ -420,7 +428,7 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
     informationGain: s.informationBits,
     confidence: s.confidence,
   }))
-  const anonymity = computeAnonymity(population, evidenceItems)
+  const anonymity = computeAnonymity(population, evidenceItems, failedCollectors)
 
   // use signal-level reliability when available, fall back to flat lookup
   const masses = allSignals.map(s =>

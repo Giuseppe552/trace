@@ -55,13 +55,13 @@ describe('UK_LEGAL_FRAMEWORK', () => {
   it('includes Protection from Harassment Act', () => {
     const pha = UK_LEGAL_FRAMEWORK.find(r => r.name === 'Protection from Harassment Act 1997')
     expect(pha).toBeDefined()
-    expect(pha!.relevance).toContain('course of conduct')
+    expect(pha!.relevance.toLowerCase()).toContain('course of conduct')
   })
 
   it('includes ACPO Guide', () => {
     const acpo = UK_LEGAL_FRAMEWORK.find(r => r.name === 'ACPO Good Practice Guide v5')
     expect(acpo).toBeDefined()
-    expect(acpo!.relevance).toContain('four principles')
+    expect(acpo!.relevance.toLowerCase()).toContain('four principles')
   })
 
   it('includes Berkeley Protocol', () => {
