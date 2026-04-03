@@ -32,7 +32,7 @@ Status: O = open, R = researching, B = building, D = done
 **Files affected:** `packages/core/src/evidence/chain.ts`, `packages/collectors/src/evidence/screenshot.ts`
 
 ### 5. No error propagation
-**Status:** O
+**Status:** D
 **Problem:** If DNS lookup fails, the anonymity calculation proceeds without that data, as if the DNS layer contributed nothing. But "no evidence collected" is not the same as "no evidence exists." The reported remaining bits could be lower (more identified) than reality because missing data is treated as zero rather than unknown.
 **What needs to happen:** Research uncertainty propagation in Dempster-Shafer theory. When a collector fails, the mass function should allocate mass to uncertainty (m(theta) = 1) rather than being omitted. Track which collectors ran vs which failed. Report confidence intervals on the anonymity estimate, not point estimates.
 **Files affected:** `packages/collectors/src/orchestrator.ts`, `packages/core/src/entropy/anonymity.ts`
