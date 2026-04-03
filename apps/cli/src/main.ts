@@ -33,8 +33,13 @@ import {
   reverseWhoisViewDns,
   whoisHistory,
   analyzeReviews,
+  analyzeReviewerProfile,
+  compareReviewerBehavior,
+  monitorDomain,
   type DomainSignals,
   type GoogleReview,
+  type MonitorState,
+  type ReviewerProfileData,
 } from '@trace/collectors'
 
 import {
@@ -387,6 +392,89 @@ async function main() {
     }
 
     console.log(JSON.stringify(result.data, null, 2))
+  }
+
+  else if (command === 'profile') {
+    const file = args[1]
+    if (!file) {
+      console.error('error: reviewer profile JSON file required')
+      console.error('format: { "displayName": "...", "reviews": [{ "businessName": "...", "businessCategory": "...", "businessCity": "...", "rating": 1, "text": "...", "timestamp": 1234567890000 }] }')
+      process.exit(1)
+    }
+
+    const raw = await readFile(file, 'utf-8')
+    const profiles: ReviewerProfileData[] = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [JSON.parse(raw)]
+
+    const analyses = profiles.map(p => {
+      console.error(`[trace] analyzing reviewer: ${p.displayName} (${p.reviews?.length ?? 0} reviews)`)
+      return analyzeReviewerProfile(p)
+    })
+
+    for (const a of analyses) {
+      if (a.flags.length > 0) {
+        console.error(`[trace]   ${a.displayName}: ${a.flags.length} red flags`)
+        for (const f of a.flags) console.error(`[trace]     - ${f}`)
+      } else {
+        console.error(`[trace]   ${a.displayName}: clean`)
+      }
+    }
+
+    // cross-compare if multiple profiles
+    if (analyses.length >= 2) {
+      console.error('[trace] comparing reviewer behaviors...')
+      for (let i = 0; i < analyses.length; i++) {
+        for (let j = i + 1; j < analyses.length; j++) {
+          const cmp = compareReviewerBehavior(analyses[i], analyses[j])
+          if (cmp.similarity > 0.4) {
+            console.error(`[trace]   BEHAVIORAL MATCH: "${analyses[i].displayName}" ↔ "${analyses[j].displayName}" similarity=${cmp.similarity.toFixed(3)}`)
+            for (const t of cmp.sharedTraits) console.error(`[trace]     - ${t}`)
+          }
+        }
+      }
+    }
+
+    console.log(JSON.stringify(analyses, null, 2))
+  }
+
+  else if (command === 'monitor') {
+    const domain = args[1]
+    if (!domain) { console.error('error: domain required'); process.exit(1) }
+
+    const stateFile = `trace-monitor-${domain}.json`
+    let previousState: MonitorState | null = null
+    try {
+      const raw = await readFile(stateFile, 'utf-8')
+      previousState = JSON.parse(raw)
+      console.error(`[trace] loaded previous state from ${stateFile} (last checked: ${previousState!.lastChecked})`)
+    } catch {
+      console.error(`[trace] no previous state found — first run for ${domain}`)
+    }
+
+    console.error(`[trace] monitoring ${domain}...`)
+    const result = await monitorDomain(
+      { domain, checks: ['dns', 'ct'] },
+      previousState,
+    )
+
+    if (result.changes.length > 0) {
+      console.error(`[trace] ${result.changes.length} change(s) detected:`)
+      for (const c of result.changes) {
+        console.error(`[trace]   [${c.severity.toUpperCase()}] ${c.type}: ${c.description}`)
+      }
+    } else {
+      console.error(`[trace] no changes detected`)
+    }
+
+    // save state for next run
+    await writeFile(stateFile, JSON.stringify(result.newState, null, 2))
+    console.error(`[trace] state saved to ${stateFile}`)
+
+    console.log(JSON.stringify({
+      domain: result.domain,
+      checkedAt: result.checkedAt,
+      changes: result.changes,
+      signals: result.signals,
+    }, null, 2))
   }
 
   else if (command === 'ai') {
