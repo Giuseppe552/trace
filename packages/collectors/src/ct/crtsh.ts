@@ -15,6 +15,12 @@
  * - Shared SANs link apparently unrelated domains
  * - Cert issuance dates show when infrastructure was provisioned
  * - Organization field in cert reveals entity behind the domain
+ *
+ * LIMITATION (audit #15): single-source data from crt.sh only.
+ * Li et al. CCS 2019 found ~6.7% of certificates missing from
+ * individual monitors. For higher confidence, corroborate with
+ * a second CT source (Censys, Google CT). Not implemented yet —
+ * the limitation is documented in the forensic report error rates.
  */
 
 import type { CollectorResult, Signal, FetchOptions } from '../types.js'

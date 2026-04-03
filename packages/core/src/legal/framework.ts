@@ -218,10 +218,15 @@ export function generateLegalBasis(): string {
 }
 
 /**
- * ACPO Principle compliance checker.
+ * ACPO Principle alignment checker.
  *
- * Verifies that an investigation's evidence chain meets the
- * four ACPO principles for digital evidence.
+ * Checks whether the evidence chain ALIGNS with the four ACPO
+ * principles. This is NOT a full compliance assessment — real ACPO
+ * compliance requires qualified personnel, validated methodology,
+ * and independent reproducibility testing. This check verifies
+ * the technical prerequisites only.
+ *
+ * Labeled as "alignment" rather than "compliance" per audit #14.
  */
 export interface AcpoCompliance {
   /** Principle 1: data integrity — no data was changed */

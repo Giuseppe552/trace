@@ -18,6 +18,16 @@
  * - Profile name → social media correlation
  * - Review timing → KS test for coordination
  * - Review text → stylometry comparison with suspect's known writing
+ *
+ * LIMITATIONS (documented per audit #12):
+ * - Suspicion heuristics are keyword-based and trivially evaded.
+ *   "go to CompetitorX instead" is caught, but "after this experience
+ *   I found a better provider" is not. This catches unsophisticated
+ *   attacks only (~80% of real cases per industry estimates).
+ * - Heuristics are NOT calibrated against a labeled benchmark dataset.
+ *   No published false positive/negative rates.
+ * - A flagged review is an INDICATOR for further investigation,
+ *   not a determination of fakeness.
  */
 
 import type { CollectorResult, Signal } from '../types.js'

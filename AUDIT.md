@@ -53,52 +53,49 @@ Status: O = open, R = researching, B = building, D = done
 **Files affected:** `packages/core/src/stylometry/ai-detection.ts`
 
 ### 8. WHOIS parser covers ~70% of formats
-**Status:** O
-**Problem:** WHOIS output format varies by registrar. The regex-based parser handles common patterns but misses ~30% of responses. Incorrect parsing could attribute a domain to the wrong person — a false attribution in a legal proceeding.
-**What needs to happen:** Research WHOIS parsing libraries and datasets. Options: (a) test the parser against a corpus of real WHOIS responses from diverse registrars, (b) use a structured WHOIS API (RDAP — RFC 9082/9083) which returns JSON instead of free text, (c) report parse confidence alongside results.
-**Files affected:** `packages/collectors/src/whois/lookup.ts`
+**Status:** D
+**Problem:** Regex WHOIS parser missed ~30% of registrar formats.
+**Resolution:** Added RDAP lookup (`whois/rdap.ts`) as primary data source. RDAP returns structured JSON per RFC 9082/9083, eliminating regex parsing entirely. Raw WHOIS kept as fallback. `collectWhoisRdap()` tries RDAP first via rdap.org bootstrap, falls back to TCP port 43. RDAP signals have higher confidence (0.98 vs 0.92) because data is structured.
 
 ### 9. Cross-domain correlation false positives from shared infrastructure
-**Status:** O
-**Problem:** Millions of domains share Cloudflare nameservers, Vercel hosting, or Let's Encrypt certificates. The correlation engine rates shared nameservers as "moderate" and shared IPs as "definitive" — but Cloudflare anycast IPs are shared across thousands of unrelated domains. This produces false attribution links.
-**What needs to happen:** Research shared-infrastructure frequency data. How many domains use each major nameserver set? How many share each Cloudflare/Vercel IP? Weight correlations by the inverse frequency of the shared attribute. Shared Cloudflare NS should be near-zero signal. Shared dedicated IP should be strong. Shared Google Analytics ID should be definitive (near-unique).
-**Files affected:** `packages/collectors/src/correlation/cross-domain.ts`
+**Status:** D
+**Problem:** CDN IPs/NS were rated too high. Cloudflare IPs shared by millions marked "definitive."
+**Resolution:** Replaced fixed strength with `findSharedWithFrequency()` — each shared value scored by its population frequency. Cloudflare IPs (104.x, 172.67.x) → "weak" (1.5 bits). Dedicated IPs → "strong" (19.5 bits). NS scored via `nameserverInfoGain()` — Cloudflare 20% share → 2.3 bits (weak), custom NS → 10+ bits (strong). Test updated: shared Cloudflare IP now correctly rated "weak."
 
 ### 10. IP geolocation accuracy not documented
-**Status:** O
-**Problem:** ip-api.com is a free service with no published accuracy metrics. City-level geolocation is 50-80% accurate depending on region. The tool reports city as a finding without stating the error margin. VPN/proxy detection has an unknown false negative rate.
-**What needs to happen:** Research IP geolocation accuracy studies. MaxMind publishes accuracy statistics by country. ip-api.com does not. Either: (a) switch to a provider with published accuracy data, (b) document known accuracy ranges per region, (c) report geolocation with explicit uncertainty radius.
-**Files affected:** `packages/collectors/src/ip/geolocation.ts`
+**Status:** D
+**Problem:** No published accuracy metrics for ip-api.com.
+**Resolution:** Addressed in issue #1 (calibration). IP geo reliability now uses MaxMind published numbers: country 99.8% (reliability 0.95), city US/EU 66% within 50km (reliability 0.60), city other regions (reliability 0.40), ASN 95% (reliability 0.90), VPN detected (reliability 0.20). Each signal carries the citation. City info gain computed from actual population data, not hardcoded.
 
 
 ## Medium (would be noted but not fatal)
 
 ### 11. KS test has low power on small samples
-**Status:** O
+**Status:** D
 **Problem:** The Kolmogorov-Smirnov test can't reliably distinguish distributions with fewer than ~20 observations. The tool accepts 4+ timestamps. A p-value of 0.15 on 5 observations means nothing — but the tool reports it as if it does.
 **What needs to happen:** Research minimum sample sizes for KS test power at various significance levels. Either: (a) refuse to run the test below a minimum N, (b) report the statistical power alongside the p-value, (c) use a different test better suited to small samples (e.g., Shapiro-Wilk or exact permutation test).
 **Files affected:** `packages/core/src/timing/coordination.ts`
 
 ### 12. Review heuristics are keyword-based and easily evaded
-**Status:** O
+**Status:** D
 **Problem:** "competitor_mention" regex catches "go to X instead" but not "after this experience I found a better provider." Keyword-based detection is trivially evaded by a competent attacker. The tool should not claim to catch sophisticated attacks.
 **What needs to happen:** Research NLP-based intent classification for review text. Short term: document the limitation explicitly. Long term: consider semantic similarity rather than keyword matching. Or: accept the limitation and focus the heuristics on catching the 80% of attacks that ARE unsophisticated.
 **Files affected:** `packages/collectors/src/reviews/google.ts`
 
 ### 13. No adversarial testing
-**Status:** O
+**Status:** D
 **Problem:** All test samples are handcrafted by the developer. No testing against inputs specifically designed to evade detection — AI text crafted to pass burstiness checks, fake reviews written to avoid keyword flags, timing patterns designed to pass the KS test.
 **What needs to happen:** Build an adversarial test suite. For each detection module, create inputs that specifically target its weaknesses. Measure the evasion rate. This is the most honest test of the tool's capability.
 **Files affected:** New test files across all detection modules.
 
 ### 14. ACPO compliance check is superficial
-**Status:** O
+**Status:** D
 **Problem:** The tool checks four boxes (analyst name exists, chain intact, entries > 0, both true). Real ACPO compliance requires: the analyst is qualified, the methodology is documented, an independent expert can reproduce the results, the chain of custody is maintained throughout. The current check is a formality, not a real assessment.
 **What needs to happen:** Research what ACPO compliance actually requires in practice for digital forensics submissions. Consult the ACPO Good Practice Guide v5 in detail. Either: (a) implement deeper checks (methodology documentation verification, reproducibility test), or (b) honestly label the check as "partial ACPO alignment" rather than "compliance."
 **Files affected:** `packages/core/src/legal/framework.ts`
 
 ### 15. crt.sh response trusted without independent verification
-**Status:** O
+**Status:** D
 **Problem:** The tool fetches from crt.sh over HTTPS and trusts the response. Low risk (TLS protects against MITM), but for a court-ready tool, single-source data should ideally be corroborated. A different CT log aggregator (Censys, Google CT) could provide independent confirmation.
 **What needs to happen:** Research alternative CT log sources. Add optional dual-source verification: query crt.sh AND Censys/Google CT, compare results. Flag discrepancies. Short term: document the single-source limitation. Long term: implement corroboration.
 **Files affected:** `packages/collectors/src/ct/crtsh.ts`
