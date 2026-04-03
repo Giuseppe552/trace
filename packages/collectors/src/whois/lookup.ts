@@ -210,13 +210,23 @@ export async function collectWhois(
   // build signals
   const signals: Signal[] = []
 
+  // reliability depends on whether registrant data is visible or redacted
+  // ICANN ARS Phase 2 Cycle 6 (2018): 92% email operability when visible
+  // post-GDPR: 73% of gTLD domains have no registrant email
+  const REL_VISIBLE = 0.92
+  const REL_VISIBLE_CITE = 'ICANN ARS Phase 2 Cycle 6, 2018: 92% registrant email operability'
+  const REL_REDACTED = 0.10
+  const REL_REDACTED_CITE = 'WhoisXML API: 73% of gTLD domains have no registrant email post-GDPR'
+
   if (data.registrantEmail && !data.isPrivacyProtected) {
     signals.push({
       source: 'whois',
       observation: `registrant email: ${data.registrantEmail}`,
       score: 0.9,
       confidence: 0.95,
-      informationBits: 20.0, // email is near-unique
+      reliability: REL_VISIBLE,
+      reliabilityCitation: REL_VISIBLE_CITE,
+      informationBits: 20.0,
       rawData: data.registrantEmail,
       sourceUrl: url,
     })
@@ -228,6 +238,8 @@ export async function collectWhois(
       observation: `registrant organization: ${data.registrantOrg}`,
       score: 0.85,
       confidence: 0.90,
+      reliability: REL_VISIBLE,
+      reliabilityCitation: REL_VISIBLE_CITE,
       informationBits: 12.0,
       rawData: data.registrantOrg,
       sourceUrl: url,
@@ -240,6 +252,8 @@ export async function collectWhois(
       observation: `registrant name: ${data.registrantName}`,
       score: 0.80,
       confidence: 0.85,
+      reliability: REL_VISIBLE,
+      reliabilityCitation: REL_VISIBLE_CITE,
       informationBits: 10.0,
       rawData: data.registrantName,
       sourceUrl: url,
@@ -252,6 +266,8 @@ export async function collectWhois(
       observation: 'registrant data privacy-protected (GDPR redacted)',
       score: 0.1,
       confidence: 0.95,
+      reliability: REL_REDACTED,
+      reliabilityCitation: REL_REDACTED_CITE,
       informationBits: 0.5,
       rawData: 'privacy-protected',
       sourceUrl: url,
@@ -264,6 +280,8 @@ export async function collectWhois(
       observation: `nameservers: ${data.nameservers.join(', ')}`,
       score: 0.5,
       confidence: 0.95,
+      reliability: REL_REDACTED, // NS data available even when registrant redacted, but low attribution value
+      reliabilityCitation: 'NS data is factual but shared across many domains; low attribution specificity',
       informationBits: 2.0,
       rawData: data.nameservers.join(', '),
       sourceUrl: url,
@@ -276,6 +294,8 @@ export async function collectWhois(
       observation: `registrar: ${data.registrar}`,
       score: 0.3,
       confidence: 0.95,
+      reliability: 0.90,
+      reliabilityCitation: 'Registrar data is factual from WHOIS; DNS records are factual',
       informationBits: 1.5,
       rawData: data.registrar,
       sourceUrl: url,

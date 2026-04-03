@@ -19,6 +19,7 @@
 
 import type { CollectorResult, Signal, FetchOptions } from '../types.js'
 import { fetchWithTimeout } from '../types.js'
+import { CAL } from '../calibration.js'
 
 /** A certificate entry from crt.sh */
 export interface CrtShEntry {
@@ -155,6 +156,8 @@ export async function collectCT(
       observation: `${subdomains.length} subdomains discovered via CT logs`,
       score: 0.5,
       confidence: 0.9,
+      reliability: CAL.CT,
+      reliabilityCitation: CAL.CT_CITE,
       informationBits: Math.log2(Math.max(subdomains.length, 1)),
       rawData: subdomains.join(', '),
       sourceUrl: url,
@@ -167,6 +170,8 @@ export async function collectCT(
       observation: `${relatedDomains.length} related domains found via shared certificates`,
       score: 0.7,
       confidence: 0.85,
+      reliability: CAL.CT,
+      reliabilityCitation: CAL.CT_CITE,
       informationBits: Math.log2(Math.max(relatedDomains.length, 1)) + 3,
       rawData: relatedDomains.join(', '),
       sourceUrl: url,

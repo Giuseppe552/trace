@@ -309,7 +309,7 @@ export async function investigateReviewAttack(
   const anonymity = computeAnonymity(population, evidenceItems)
 
   const masses = allSignals.map(s =>
-    createMass(s.score, LAYER_RELIABILITY[s.source] ?? 0.5, s.source),
+    createMass(s.score, s.reliability ?? LAYER_RELIABILITY[s.source] ?? 0.5, s.source),
   )
   const attribution = fuseEvidence(masses)
 

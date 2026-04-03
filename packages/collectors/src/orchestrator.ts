@@ -422,8 +422,9 @@ export async function investigate(target: InvestigationTarget): Promise<Investig
   }))
   const anonymity = computeAnonymity(population, evidenceItems)
 
+  // use signal-level reliability when available, fall back to flat lookup
   const masses = allSignals.map(s =>
-    createMass(s.score, LAYER_RELIABILITY[s.source] ?? 0.5, s.source),
+    createMass(s.score, s.reliability ?? LAYER_RELIABILITY[s.source] ?? 0.5, s.source),
   )
   const attribution = fuseEvidence(masses)
 

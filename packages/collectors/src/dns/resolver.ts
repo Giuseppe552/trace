@@ -15,6 +15,7 @@
 
 import { Resolver } from 'node:dns/promises'
 import type { CollectorResult, Signal } from '../types.js'
+import { CAL } from '../calibration.js'
 
 /** Structured DNS result */
 export interface DnsResult {
@@ -147,20 +148,20 @@ export async function collectDns(
   // build signals
   const signals: Signal[] = []
 
-  // NS reveals DNS provider — shared NS is a strong correlation signal
   if (data.ns.length > 0) {
     signals.push({
       source: 'dns',
       observation: `nameservers: ${data.ns.join(', ')}`,
       score: 0.5,
       confidence: 0.9,
+      reliability: CAL.DNS,
+      reliabilityCitation: CAL.DNS_CITE,
       informationBits: 2.0,
       rawData: data.ns.join(', '),
       sourceUrl: url,
     })
   }
 
-  // MX reveals email provider
   if (data.mx.length > 0) {
     const primary = data.mx[0].exchange
     signals.push({
@@ -168,39 +169,42 @@ export async function collectDns(
       observation: `email provider: ${primary}`,
       score: 0.4,
       confidence: 0.9,
+      reliability: CAL.DNS,
+      reliabilityCitation: CAL.DNS_CITE,
       informationBits: 1.5,
       rawData: data.mx.map(m => `${m.priority} ${m.exchange}`).join(', '),
       sourceUrl: url,
     })
   }
 
-  // verification tokens reveal which services the domain uses
   if (data.verificationTokens.length > 0) {
     signals.push({
       source: 'dns',
       observation: `verified with: ${data.verificationTokens.map(t => t.provider).join(', ')}`,
       score: 0.6,
       confidence: 0.95,
+      reliability: CAL.TRACKING_GA, // verification tokens are near-unique like tracking IDs
+      reliabilityCitation: CAL.TRACKING_GA_CITE,
       informationBits: data.verificationTokens.length * 1.5,
       rawData: JSON.stringify(data.verificationTokens),
       sourceUrl: url,
     })
   }
 
-  // A records reveal hosting
   if (data.a.length > 0) {
     signals.push({
       source: 'dns',
       observation: `hosted on: ${data.a.join(', ')}`,
       score: 0.4,
       confidence: 0.95,
+      reliability: CAL.DNS,
+      reliabilityCitation: CAL.DNS_CITE,
       informationBits: 1.0,
       rawData: data.a.join(', '),
       sourceUrl: url,
     })
   }
 
-  // SOA hostmaster can reveal admin contact
   if (data.soa?.hostmaster) {
     const email = data.soa.hostmaster.replace(/\./, '@', )
     signals.push({
@@ -208,6 +212,8 @@ export async function collectDns(
       observation: `SOA hostmaster: ${email}`,
       score: 0.5,
       confidence: 0.7,
+      reliability: CAL.DNS,
+      reliabilityCitation: CAL.DNS_CITE,
       informationBits: 3.0,
       rawData: data.soa.hostmaster,
       sourceUrl: url,

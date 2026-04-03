@@ -18,6 +18,19 @@ export interface Signal {
   score: number
   /** confidence in the measurement (0-1) */
   confidence: number
+  /**
+   * Reliability of this specific measurement (0-1).
+   * Computed by the collector based on context — not a flat lookup.
+   * E.g. WHOIS is 0.92 when registrant is visible, 0.10 when redacted.
+   * Each value cites the study it was derived from.
+   *
+   * Optional during migration. When absent, the orchestrator falls
+   * back to LAYER_RELIABILITY[source]. Collectors should set this
+   * explicitly — the fallback is for backward compatibility only.
+   */
+  reliability?: number
+  /** short citation for the reliability value */
+  reliabilityCitation?: string
   /** information gain in bits (for anonymity computation) */
   informationBits: number
   /** raw data for evidence chain */

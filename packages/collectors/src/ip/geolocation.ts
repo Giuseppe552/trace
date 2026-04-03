@@ -21,6 +21,7 @@
 
 import type { CollectorResult, Signal, FetchOptions } from '../types.js'
 import { fetchWithTimeout } from '../types.js'
+import { ipGeoReliability } from '../calibration.js'
 
 /** IP geolocation result */
 export interface IpGeoResult {
@@ -140,7 +141,6 @@ export async function lookupIp(
   const signals: Signal[] = []
 
   if (data.country) {
-    // population-based information gain
     const COUNTRY_POP: Record<string, number> = {
       GB: 67_000_000, US: 334_000_000, DE: 84_000_000, FR: 68_000_000,
       IT: 59_000_000, ES: 47_000_000, NL: 17_500_000, PL: 38_000_000,
@@ -150,12 +150,15 @@ export async function lookupIp(
     const countryPop = COUNTRY_POP[data.countryCode ?? ''] ?? 50_000_000
     const worldPop = 8_000_000_000
     const gain = Math.log2(worldPop / countryPop)
+    const countryRel = ipGeoReliability('country', data.countryCode, data.isProxy)
 
     signals.push({
       source: 'ip_geo',
       observation: `country: ${data.country} (${data.countryCode})`,
       score: 0.5,
       confidence: data.isProxy ? 0.30 : 0.85,
+      reliability: countryRel.value,
+      reliabilityCitation: countryRel.cite,
       informationBits: gain,
       rawData: `${data.country} (${data.countryCode})`,
       sourceUrl: url,
@@ -163,23 +166,29 @@ export async function lookupIp(
   }
 
   if (data.city) {
+    const cityRel = ipGeoReliability('city', data.countryCode, data.isProxy)
     signals.push({
       source: 'ip_geo',
       observation: `city: ${data.city}, ${data.region}`,
       score: 0.6,
       confidence: data.isProxy ? 0.20 : 0.70,
-      informationBits: 8.0, // city-level narrows significantly
+      reliability: cityRel.value,
+      reliabilityCitation: cityRel.cite,
+      informationBits: 8.0,
       rawData: `${data.city}, ${data.region}, ${data.country}`,
       sourceUrl: url,
     })
   }
 
   if (data.asName) {
+    const asnRel = ipGeoReliability('asn', data.countryCode, data.isProxy)
     signals.push({
       source: 'ip_geo',
       observation: `ASN: AS${data.asn} ${data.asName}`,
       score: data.isHosting ? 0.3 : 0.5,
       confidence: 0.95,
+      reliability: asnRel.value,
+      reliabilityCitation: asnRel.cite,
       informationBits: 2.0,
       rawData: `AS${data.asn} ${data.asName}`,
       sourceUrl: url,
@@ -187,11 +196,14 @@ export async function lookupIp(
   }
 
   if (data.isHosting) {
+    const hostRel = ipGeoReliability('asn', data.countryCode, false)
     signals.push({
       source: 'ip_geo',
       observation: 'datacenter/hosting IP — not a residential connection',
       score: 0.3,
       confidence: 0.90,
+      reliability: hostRel.value,
+      reliabilityCitation: hostRel.cite,
       informationBits: 1.0,
       rawData: `hosting=true, ASN=${data.asn}`,
       sourceUrl: url,
@@ -199,12 +211,15 @@ export async function lookupIp(
   }
 
   if (data.isProxy) {
+    const proxyRel = ipGeoReliability('country', data.countryCode, true)
     signals.push({
       source: 'ip_geo',
       observation: 'proxy/VPN detected — location data unreliable',
       score: 0.2,
       confidence: 0.80,
-      informationBits: 0.5, // low info gain because location is masked
+      reliability: proxyRel.value,
+      reliabilityCitation: proxyRel.cite,
+      informationBits: 0.5,
       rawData: `proxy=true, org=${data.org}`,
       sourceUrl: url,
     })
