@@ -36,6 +36,7 @@ import {
   analyzeReviewerProfile,
   compareReviewerBehavior,
   monitorDomain,
+  checkTyposquats,
   type DomainSignals,
   type GoogleReview,
   type MonitorState,
@@ -473,6 +474,29 @@ async function main() {
       domain: result.domain,
       checkedAt: result.checkedAt,
       changes: result.changes,
+      signals: result.signals,
+    }, null, 2))
+  }
+
+  else if (command === 'typosquat') {
+    const domain = args[1]
+    if (!domain) { console.error('error: brand domain required'); process.exit(1) }
+
+    console.error(`[trace] scanning for typosquats of ${domain}...`)
+    const result = await checkTyposquats(domain)
+
+    console.error(`[trace] ${result.totalCandidates} candidates generated`)
+    console.error(`[trace] ${result.registeredCount} registered typosquats found`)
+
+    for (const r of result.registered) {
+      console.error(`[trace]   ${r.domain} (${r.technique}) → ${r.ips.join(', ')}`)
+    }
+
+    console.log(JSON.stringify({
+      brandDomain: result.brandDomain,
+      totalCandidates: result.totalCandidates,
+      registeredCount: result.registeredCount,
+      registered: result.registered,
       signals: result.signals,
     }, null, 2))
   }

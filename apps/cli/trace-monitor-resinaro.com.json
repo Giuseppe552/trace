@@ -1,0 +1,26 @@
+{
+  "domain": "resinaro.com",
+  "lastChecked": "2026-04-03T08:09:17.832Z",
+  "dns": {
+    "a": [
+      "104.21.49.223",
+      "172.67.152.253"
+    ],
+    "ns": [
+      "candy.ns.cloudflare.com",
+      "yisroel.ns.cloudflare.com"
+    ],
+    "mx": [],
+    "txt": [
+      "v=spf1 include:resend.com -all",
+      "protonmail-verification=1bf658639caffe56c167e3e0d58d8772f464a10c",
+      "google-site-verification=hUIuPlO3FzoAMzp6pjvK3IDNoBKSZKiuR5PdrhQulOo"
+    ]
+  },
+  "ct": {
+    "certCount": 35,
+    "subdomains": [
+      "www.resinaro.com"
+    ]
+  }
+}
