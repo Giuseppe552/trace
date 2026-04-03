@@ -37,6 +37,7 @@ import {
   compareReviewerBehavior,
   monitorDomain,
   checkTyposquats,
+  investigateReviewAttack,
   type DomainSignals,
   type GoogleReview,
   type MonitorState,
@@ -393,6 +394,44 @@ async function main() {
     }
 
     console.log(JSON.stringify(result.data, null, 2))
+  }
+
+  else if (command === 'investigate-reviews') {
+    const file = args[1]
+    if (!file) {
+      console.error('error: review attack input JSON required')
+      console.error('format: { "businessName": "...", "reviews": [...], "suspectedCompetitorDomain": "..." }')
+      process.exit(1)
+    }
+
+    const raw = await readFile(file, 'utf-8')
+    const input = JSON.parse(raw)
+
+    console.error(`[trace] investigating review attack on "${input.businessName}"...`)
+
+    const result = await investigateReviewAttack(input)
+
+    console.error(`[trace] ${result.signals.length} signals collected`)
+    console.error(`[trace] reviews: ${result.reviewAnalysis.suspiciousCount} suspicious, ${result.reviewAnalysis.aiDetectedCount} AI-detected, ${result.reviewAnalysis.burstGroups} bursts`)
+    console.error(`[trace] stylometry: ${result.stylometryMatches.length} writing matches`)
+    console.error(`[trace] behavioral: ${result.behavioralMatches.length} behavioral matches`)
+    if (result.timingAnalysis) {
+      console.error(`[trace] timing: ${result.timingAnalysis.likelyCoordinated ? 'COORDINATED' : 'natural'} (confidence: ${result.timingAnalysis.confidence.toFixed(2)})`)
+    }
+    console.error(`[trace] anonymity: ${result.anonymity.remainingBits.toFixed(1)} bits remaining (set: ${result.anonymity.anonymitySet})`)
+    console.error(`[trace] attribution: ${result.attribution.level} (belief=${result.attribution.belief.toFixed(3)})`)
+    console.error(`[trace] graph: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges`)
+
+    // save outputs
+    const jsonFile = `trace-review-attack-${result.label}.json`
+    await writeFile(jsonFile, JSON.stringify(result, null, 2))
+    console.error(`[trace] report saved to ${jsonFile}`)
+
+    const dotFile = `trace-review-attack-${result.label}.dot`
+    await writeFile(dotFile, result.graphDot)
+    console.error(`[trace] graph saved to ${dotFile}`)
+
+    console.log(JSON.stringify(result, null, 2))
   }
 
   else if (command === 'profile') {
