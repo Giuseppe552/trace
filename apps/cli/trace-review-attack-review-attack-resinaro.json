@@ -1,0 +1,355 @@
+{
+  "label": "review-attack-resinaro",
+  "startedAt": "2026-04-03T08:30:17.790Z",
+  "completedAt": "2026-04-03T08:30:17.961Z",
+  "reviewAnalysis": {
+    "totalReviews": 5,
+    "suspiciousCount": 2,
+    "aiDetectedCount": 0,
+    "burstGroups": 1
+  },
+  "stylometryMatches": [
+    {
+      "authorA": "Maria P",
+      "authorB": "SuspiciousUser1",
+      "similarity": 0.8690357027502416
+    },
+    {
+      "authorA": "Maria P",
+      "authorB": "SuspiciousUser2",
+      "similarity": 0.8739210681962478
+    },
+    {
+      "authorA": "Maria P",
+      "authorB": "SuspiciousUser3",
+      "similarity": 0.8309793859570925
+    },
+    {
+      "authorA": "Maria P",
+      "authorB": "James T",
+      "similarity": 0.8718767551108244
+    },
+    {
+      "authorA": "SuspiciousUser1",
+      "authorB": "SuspiciousUser2",
+      "similarity": 0.876961327089297
+    },
+    {
+      "authorA": "SuspiciousUser1",
+      "authorB": "SuspiciousUser3",
+      "similarity": 0.8002699156413033
+    },
+    {
+      "authorA": "SuspiciousUser1",
+      "authorB": "James T",
+      "similarity": 0.8647374192190367
+    },
+    {
+      "authorA": "SuspiciousUser2",
+      "authorB": "SuspiciousUser3",
+      "similarity": 0.8198010953918309
+    },
+    {
+      "authorA": "SuspiciousUser2",
+      "authorB": "James T",
+      "similarity": 0.8647316319696683
+    },
+    {
+      "authorA": "SuspiciousUser3",
+      "authorB": "James T",
+      "similarity": 0.822702816671464
+    }
+  ],
+  "aiDetection": [
+    {
+      "author": "Maria P",
+      "verdict": "likely_human",
+      "probability": 0.09090909090909091,
+      "triggers": []
+    },
+    {
+      "author": "SuspiciousUser1",
+      "verdict": "likely_human",
+      "probability": 0,
+      "triggers": []
+    },
+    {
+      "author": "SuspiciousUser2",
+      "verdict": "likely_human",
+      "probability": 0.27272727272727276,
+      "triggers": [
+        "high AI-typical transition density (0.50 per sentence)"
+      ]
+    },
+    {
+      "author": "SuspiciousUser3",
+      "verdict": "uncertain",
+      "probability": 0.5,
+      "triggers": []
+    },
+    {
+      "author": "James T",
+      "verdict": "likely_human",
+      "probability": 0,
+      "triggers": []
+    }
+  ],
+  "behavioralMatches": [],
+  "timingAnalysis": {
+    "likelyCoordinated": false,
+    "confidence": 0,
+    "reason": "timing is consistent with natural human behavior (KS p=0.1910, CV=1.307)"
+  },
+  "competitorInvestigation": {
+    "domain": "example-competitor.co.uk",
+    "platform": null,
+    "sharedInfrastructure": []
+  },
+  "signals": [
+    {
+      "source": "review_profile",
+      "observation": "2/5 reviews flagged as suspicious (avg score: 0.50)",
+      "score": 0.5,
+      "confidence": 0.6,
+      "informationBits": 1.3219280948873624,
+      "rawData": "[{\"author\":\"SuspiciousUser1\",\"flags\":[\"competitor_mention\"],\"score\":0.5},{\"author\":\"SuspiciousUser2\",\"flags\":[\"competitor_mention\"],\"score\":0.5}]",
+      "sourceUrl": "google-maps:Resinaro"
+    },
+    {
+      "source": "review_profile",
+      "observation": "1 review burst(s) detected: 3 reviews in 24h windows",
+      "score": 0.65,
+      "confidence": 0.55,
+      "informationBits": 2,
+      "rawData": "[{\"count\":3,\"authors\":[\"SuspiciousUser1\",\"SuspiciousUser2\",\"SuspiciousUser3\"]}]",
+      "sourceUrl": "google-maps:Resinaro"
+    },
+    {
+      "source": "review_profile",
+      "observation": "3 one-star reviews out of 5 total",
+      "score": 0.6,
+      "confidence": 0.5,
+      "informationBits": 1,
+      "rawData": "3/5",
+      "sourceUrl": "google-maps:Resinaro"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"Maria P\" and \"SuspiciousUser1\" have similar writing style (0.869)",
+      "score": 0.8690357027502416,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8690357027502416,\"scalarSimilarity\":0.9965501725804985,\"bigramSimilarity\":0.677763998004856,\"featuresA\":{\"avgWordLength\":5.821428571428571,\"avgSentenceLength\":9.333333333333334,\"sentenceLengthStd\":3.511884584284246,\"vocabularyRichness\":0.9642857142857143,\"yulesK\":25.510204081632654,\"functionWordRatio\":0.42857142857142855,\"punctuationRate\":0.10714285714285714,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.3333333333333333,\"midCapRate\":0.1111111111111111,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":28,\"charBigrams\":{},\"wordLengthDist\":[0,0.10714285714285714,0.17857142857142858,0.17857142857142858,0.10714285714285714,0.03571428571428571,0.10714285714285714,0.07142857142857142,0.07142857142857142,0.03571428571428571,0.07142857142857142,0,0,0.03571428571428571,0]},\"featuresB\":{\"avgWordLength\":5.56,\"avgSentenceLength\":8.333333333333334,\"sentenceLengthStd\":5.507570547286102,\"vocabularyRichness\":0.92,\"yulesK\":64,\"functionWordRatio\":0.48,\"punctuationRate\":0.16,\"commaRate\":0.3333333333333333,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.125,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":25,\"charBigrams\":{},\"wordLengthDist\":[0,0.12,0.16,0.32,0.04,0,0.12,0.08,0,0,0.04,0.12,0,0,0]}}",
+      "sourceUrl": "stylometry:Maria P+SuspiciousUser1"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"Maria P\" and \"SuspiciousUser2\" have similar writing style (0.874)",
+      "score": 0.8739210681962478,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8739210681962478,\"scalarSimilarity\":0.9982245361838368,\"bigramSimilarity\":0.6874658662148644,\"featuresA\":{\"avgWordLength\":5.821428571428571,\"avgSentenceLength\":9.333333333333334,\"sentenceLengthStd\":3.511884584284246,\"vocabularyRichness\":0.9642857142857143,\"yulesK\":25.510204081632654,\"functionWordRatio\":0.42857142857142855,\"punctuationRate\":0.10714285714285714,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.3333333333333333,\"midCapRate\":0.1111111111111111,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":28,\"charBigrams\":{},\"wordLengthDist\":[0,0.10714285714285714,0.17857142857142858,0.17857142857142858,0.10714285714285714,0.03571428571428571,0.10714285714285714,0.07142857142857142,0.07142857142857142,0.03571428571428571,0.07142857142857142,0,0,0.03571428571428571,0]},\"featuresB\":{\"avgWordLength\":5.625,\"avgSentenceLength\":10,\"sentenceLengthStd\":3.6514837167011076,\"vocabularyRichness\":0.9,\"yulesK\":50,\"functionWordRatio\":0.45,\"punctuationRate\":0.15,\"commaRate\":0.5,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.5,\"midCapRate\":0.10256410256410256,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":40,\"charBigrams\":{},\"wordLengthDist\":[0.1,0.125,0.125,0.125,0.125,0.025,0.1,0.075,0.025,0.025,0.025,0.075,0.025,0.025,0]}}",
+      "sourceUrl": "stylometry:Maria P+SuspiciousUser2"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"Maria P\" and \"SuspiciousUser3\" have similar writing style (0.831)",
+      "score": 0.8309793859570925,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8309793859570925,\"scalarSimilarity\":0.9954641187966234,\"bigramSimilarity\":0.5842522866977962,\"featuresA\":{\"avgWordLength\":5.821428571428571,\"avgSentenceLength\":9.333333333333334,\"sentenceLengthStd\":3.511884584284246,\"vocabularyRichness\":0.9642857142857143,\"yulesK\":25.510204081632654,\"functionWordRatio\":0.42857142857142855,\"punctuationRate\":0.10714285714285714,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.3333333333333333,\"midCapRate\":0.1111111111111111,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":28,\"charBigrams\":{},\"wordLengthDist\":[0,0.10714285714285714,0.17857142857142858,0.17857142857142858,0.10714285714285714,0.03571428571428571,0.10714285714285714,0.07142857142857142,0.07142857142857142,0.03571428571428571,0.07142857142857142,0,0,0.03571428571428571,0]},\"featuresB\":{\"avgWordLength\":5.0588235294117645,\"avgSentenceLength\":4.25,\"sentenceLengthStd\":2.9860788111948193,\"vocabularyRichness\":1,\"yulesK\":0,\"functionWordRatio\":0.35294117647058826,\"punctuationRate\":0.23529411764705882,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.25,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":17,\"charBigrams\":{},\"wordLengthDist\":[0,0.058823529411764705,0.17647058823529413,0.35294117647058826,0.11764705882352941,0,0.17647058823529413,0,0.058823529411764705,0,0.058823529411764705,0,0,0,0]}}",
+      "sourceUrl": "stylometry:Maria P+SuspiciousUser3"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"Maria P\" and \"James T\" have similar writing style (0.872)",
+      "score": 0.8718767551108244,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8718767551108244,\"scalarSimilarity\":0.9981007237471752,\"bigramSimilarity\":0.6825408021562984,\"featuresA\":{\"avgWordLength\":5.821428571428571,\"avgSentenceLength\":9.333333333333334,\"sentenceLengthStd\":3.511884584284246,\"vocabularyRichness\":0.9642857142857143,\"yulesK\":25.510204081632654,\"functionWordRatio\":0.42857142857142855,\"punctuationRate\":0.10714285714285714,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.3333333333333333,\"midCapRate\":0.1111111111111111,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":28,\"charBigrams\":{},\"wordLengthDist\":[0,0.10714285714285714,0.17857142857142858,0.17857142857142858,0.10714285714285714,0.03571428571428571,0.10714285714285714,0.07142857142857142,0.07142857142857142,0.03571428571428571,0.07142857142857142,0,0,0.03571428571428571,0]},\"featuresB\":{\"avgWordLength\":6.173913043478261,\"avgSentenceLength\":7.666666666666667,\"sentenceLengthStd\":4.509249752822894,\"vocabularyRichness\":0.9565217391304348,\"yulesK\":37.80718336483932,\"functionWordRatio\":0.391304347826087,\"punctuationRate\":0.13043478260869565,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.13636363636363635,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":23,\"charBigrams\":{},\"wordLengthDist\":[0,0.043478260869565216,0.17391304347826086,0.17391304347826086,0.13043478260869565,0.043478260869565216,0.13043478260869565,0.043478260869565216,0.08695652173913043,0.043478260869565216,0.08695652173913043,0.043478260869565216,0,0,0]}}",
+      "sourceUrl": "stylometry:Maria P+James T"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser1\" and \"SuspiciousUser2\" have similar writing style (0.877)",
+      "score": 0.876961327089297,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.876961327089297,\"scalarSimilarity\":0.9948259641344572,\"bigramSimilarity\":0.7001643715215566,\"featuresA\":{\"avgWordLength\":5.56,\"avgSentenceLength\":8.333333333333334,\"sentenceLengthStd\":5.507570547286102,\"vocabularyRichness\":0.92,\"yulesK\":64,\"functionWordRatio\":0.48,\"punctuationRate\":0.16,\"commaRate\":0.3333333333333333,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.125,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":25,\"charBigrams\":{},\"wordLengthDist\":[0,0.12,0.16,0.32,0.04,0,0.12,0.08,0,0,0.04,0.12,0,0,0]},\"featuresB\":{\"avgWordLength\":5.625,\"avgSentenceLength\":10,\"sentenceLengthStd\":3.6514837167011076,\"vocabularyRichness\":0.9,\"yulesK\":50,\"functionWordRatio\":0.45,\"punctuationRate\":0.15,\"commaRate\":0.5,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.5,\"midCapRate\":0.10256410256410256,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":40,\"charBigrams\":{},\"wordLengthDist\":[0.1,0.125,0.125,0.125,0.125,0.025,0.1,0.075,0.025,0.025,0.025,0.075,0.025,0.025,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser1+SuspiciousUser2"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser1\" and \"SuspiciousUser3\" have similar writing style (0.800)",
+      "score": 0.8002699156413033,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8002699156413033,\"scalarSimilarity\":0.995850366347527,\"bigramSimilarity\":0.5068992395819678,\"featuresA\":{\"avgWordLength\":5.56,\"avgSentenceLength\":8.333333333333334,\"sentenceLengthStd\":5.507570547286102,\"vocabularyRichness\":0.92,\"yulesK\":64,\"functionWordRatio\":0.48,\"punctuationRate\":0.16,\"commaRate\":0.3333333333333333,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.125,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":25,\"charBigrams\":{},\"wordLengthDist\":[0,0.12,0.16,0.32,0.04,0,0.12,0.08,0,0,0.04,0.12,0,0,0]},\"featuresB\":{\"avgWordLength\":5.0588235294117645,\"avgSentenceLength\":4.25,\"sentenceLengthStd\":2.9860788111948193,\"vocabularyRichness\":1,\"yulesK\":0,\"functionWordRatio\":0.35294117647058826,\"punctuationRate\":0.23529411764705882,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.25,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":17,\"charBigrams\":{},\"wordLengthDist\":[0,0.058823529411764705,0.17647058823529413,0.35294117647058826,0.11764705882352941,0,0.17647058823529413,0,0.058823529411764705,0,0.058823529411764705,0,0,0,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser1+SuspiciousUser3"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser1\" and \"James T\" have similar writing style (0.865)",
+      "score": 0.8647374192190367,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8647374192190367,\"scalarSimilarity\":0.9981455735164532,\"bigramSimilarity\":0.6646251877729118,\"featuresA\":{\"avgWordLength\":5.56,\"avgSentenceLength\":8.333333333333334,\"sentenceLengthStd\":5.507570547286102,\"vocabularyRichness\":0.92,\"yulesK\":64,\"functionWordRatio\":0.48,\"punctuationRate\":0.16,\"commaRate\":0.3333333333333333,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.125,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":25,\"charBigrams\":{},\"wordLengthDist\":[0,0.12,0.16,0.32,0.04,0,0.12,0.08,0,0,0.04,0.12,0,0,0]},\"featuresB\":{\"avgWordLength\":6.173913043478261,\"avgSentenceLength\":7.666666666666667,\"sentenceLengthStd\":4.509249752822894,\"vocabularyRichness\":0.9565217391304348,\"yulesK\":37.80718336483932,\"functionWordRatio\":0.391304347826087,\"punctuationRate\":0.13043478260869565,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.13636363636363635,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":23,\"charBigrams\":{},\"wordLengthDist\":[0,0.043478260869565216,0.17391304347826086,0.17391304347826086,0.13043478260869565,0.043478260869565216,0.13043478260869565,0.043478260869565216,0.08695652173913043,0.043478260869565216,0.08695652173913043,0.043478260869565216,0,0,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser1+James T"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser2\" and \"SuspiciousUser3\" have similar writing style (0.820)",
+      "score": 0.8198010953918309,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8198010953918309,\"scalarSimilarity\":0.9916325882074499,\"bigramSimilarity\":0.5620538561684025,\"featuresA\":{\"avgWordLength\":5.625,\"avgSentenceLength\":10,\"sentenceLengthStd\":3.6514837167011076,\"vocabularyRichness\":0.9,\"yulesK\":50,\"functionWordRatio\":0.45,\"punctuationRate\":0.15,\"commaRate\":0.5,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.5,\"midCapRate\":0.10256410256410256,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":40,\"charBigrams\":{},\"wordLengthDist\":[0.1,0.125,0.125,0.125,0.125,0.025,0.1,0.075,0.025,0.025,0.025,0.075,0.025,0.025,0]},\"featuresB\":{\"avgWordLength\":5.0588235294117645,\"avgSentenceLength\":4.25,\"sentenceLengthStd\":2.9860788111948193,\"vocabularyRichness\":1,\"yulesK\":0,\"functionWordRatio\":0.35294117647058826,\"punctuationRate\":0.23529411764705882,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.25,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":17,\"charBigrams\":{},\"wordLengthDist\":[0,0.058823529411764705,0.17647058823529413,0.35294117647058826,0.11764705882352941,0,0.17647058823529413,0,0.058823529411764705,0,0.058823529411764705,0,0,0,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser2+SuspiciousUser3"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser2\" and \"James T\" have similar writing style (0.865)",
+      "score": 0.8647316319696683,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.8647316319696683,\"scalarSimilarity\":0.9948193183916317,\"bigramSimilarity\":0.6696001023367233,\"featuresA\":{\"avgWordLength\":5.625,\"avgSentenceLength\":10,\"sentenceLengthStd\":3.6514837167011076,\"vocabularyRichness\":0.9,\"yulesK\":50,\"functionWordRatio\":0.45,\"punctuationRate\":0.15,\"commaRate\":0.5,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0.5,\"midCapRate\":0.10256410256410256,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":40,\"charBigrams\":{},\"wordLengthDist\":[0.1,0.125,0.125,0.125,0.125,0.025,0.1,0.075,0.025,0.025,0.025,0.075,0.025,0.025,0]},\"featuresB\":{\"avgWordLength\":6.173913043478261,\"avgSentenceLength\":7.666666666666667,\"sentenceLengthStd\":4.509249752822894,\"vocabularyRichness\":0.9565217391304348,\"yulesK\":37.80718336483932,\"functionWordRatio\":0.391304347826087,\"punctuationRate\":0.13043478260869565,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.13636363636363635,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":23,\"charBigrams\":{},\"wordLengthDist\":[0,0.043478260869565216,0.17391304347826086,0.17391304347826086,0.13043478260869565,0.043478260869565216,0.13043478260869565,0.043478260869565216,0.08695652173913043,0.043478260869565216,0.08695652173913043,0.043478260869565216,0,0,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser2+James T"
+    },
+    {
+      "source": "stylometry",
+      "observation": "\"SuspiciousUser3\" and \"James T\" have similar writing style (0.823)",
+      "score": 0.822702816671464,
+      "confidence": 0.55,
+      "informationBits": 4,
+      "rawData": "{\"similarity\":0.822702816671464,\"scalarSimilarity\":0.9965411475584264,\"bigramSimilarity\":0.5619453203410208,\"featuresA\":{\"avgWordLength\":5.0588235294117645,\"avgSentenceLength\":4.25,\"sentenceLengthStd\":2.9860788111948193,\"vocabularyRichness\":1,\"yulesK\":0,\"functionWordRatio\":0.35294117647058826,\"punctuationRate\":0.23529411764705882,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.25,\"avgParagraphLength\":4,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":17,\"charBigrams\":{},\"wordLengthDist\":[0,0.058823529411764705,0.17647058823529413,0.35294117647058826,0.11764705882352941,0,0.17647058823529413,0,0.058823529411764705,0,0.058823529411764705,0,0,0,0]},\"featuresB\":{\"avgWordLength\":6.173913043478261,\"avgSentenceLength\":7.666666666666667,\"sentenceLengthStd\":4.509249752822894,\"vocabularyRichness\":0.9565217391304348,\"yulesK\":37.80718336483932,\"functionWordRatio\":0.391304347826087,\"punctuationRate\":0.13043478260869565,\"commaRate\":0,\"exclamationRate\":0,\"questionRate\":0,\"pronounStartRate\":0,\"midCapRate\":0.13636363636363635,\"avgParagraphLength\":3,\"contractionRate\":0,\"digitRate\":0,\"wordCount\":23,\"charBigrams\":{},\"wordLengthDist\":[0,0.043478260869565216,0.17391304347826086,0.17391304347826086,0.13043478260869565,0.043478260869565216,0.13043478260869565,0.043478260869565216,0.08695652173913043,0.043478260869565216,0.08695652173913043,0.043478260869565216,0,0,0]}}",
+      "sourceUrl": "stylometry:SuspiciousUser3+James T"
+    }
+  ],
+  "anonymity": {
+    "priorBits": 25.997657759781944,
+    "remainingBits": 1.60450090284953,
+    "anonymitySet": 3,
+    "identified": false
+  },
+  "attribution": {
+    "belief": 0.9971718856135849,
+    "plausibility": 0.9972947374661061,
+    "conflict": 0.8226123411323659,
+    "level": "high"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "Resinaro",
+        "type": "domain",
+        "label": "Resinaro"
+      },
+      {
+        "id": "reviewer:SuspiciousUser1",
+        "type": "review_profile",
+        "label": "SuspiciousUser1"
+      },
+      {
+        "id": "reviewer:SuspiciousUser2",
+        "type": "review_profile",
+        "label": "SuspiciousUser2"
+      },
+      {
+        "id": "example-competitor.co.uk",
+        "type": "domain",
+        "label": "example-competitor.co.uk"
+      }
+    ],
+    "edges": [
+      {
+        "source": "reviewer:SuspiciousUser1",
+        "target": "Resinaro",
+        "type": "reviewed_by",
+        "weight": 0.5
+      },
+      {
+        "source": "reviewer:SuspiciousUser2",
+        "target": "Resinaro",
+        "type": "reviewed_by",
+        "weight": 0.5
+      },
+      {
+        "source": "reviewer:Maria P",
+        "target": "reviewer:SuspiciousUser1",
+        "type": "writing_match",
+        "weight": 0.8690357027502416,
+        "evidence": "stylometry: 0.869"
+      },
+      {
+        "source": "reviewer:Maria P",
+        "target": "reviewer:SuspiciousUser2",
+        "type": "writing_match",
+        "weight": 0.8739210681962478,
+        "evidence": "stylometry: 0.874"
+      },
+      {
+        "source": "reviewer:Maria P",
+        "target": "reviewer:SuspiciousUser3",
+        "type": "writing_match",
+        "weight": 0.8309793859570925,
+        "evidence": "stylometry: 0.831"
+      },
+      {
+        "source": "reviewer:Maria P",
+        "target": "reviewer:James T",
+        "type": "writing_match",
+        "weight": 0.8718767551108244,
+        "evidence": "stylometry: 0.872"
+      },
+      {
+        "source": "reviewer:SuspiciousUser1",
+        "target": "reviewer:SuspiciousUser2",
+        "type": "writing_match",
+        "weight": 0.876961327089297,
+        "evidence": "stylometry: 0.877"
+      },
+      {
+        "source": "reviewer:SuspiciousUser1",
+        "target": "reviewer:SuspiciousUser3",
+        "type": "writing_match",
+        "weight": 0.8002699156413033,
+        "evidence": "stylometry: 0.800"
+      },
+      {
+        "source": "reviewer:SuspiciousUser1",
+        "target": "reviewer:James T",
+        "type": "writing_match",
+        "weight": 0.8647374192190367,
+        "evidence": "stylometry: 0.865"
+      },
+      {
+        "source": "reviewer:SuspiciousUser2",
+        "target": "reviewer:SuspiciousUser3",
+        "type": "writing_match",
+        "weight": 0.8198010953918309,
+        "evidence": "stylometry: 0.820"
+      },
+      {
+        "source": "reviewer:SuspiciousUser2",
+        "target": "reviewer:James T",
+        "type": "writing_match",
+        "weight": 0.8647316319696683,
+        "evidence": "stylometry: 0.865"
+      },
+      {
+        "source": "reviewer:SuspiciousUser3",
+        "target": "reviewer:James T",
+        "type": "writing_match",
+        "weight": 0.822702816671464,
+        "evidence": "stylometry: 0.823"
+      },
+      {
+        "source": "example-competitor.co.uk",
+        "target": "Resinaro",
+        "type": "linked_to",
+        "weight": 0.5,
+        "evidence": "suspected competitor"
+      }
+    ]
+  },
+  "graphDot": "digraph trace {\n  label=\"trace: review-attack-resinaro\";\n  labelloc=\"t\";\n  fontname=\"Helvetica\";\n  fontsize=14;\n  rankdir=LR;\n  bgcolor=\"#0c1017\";\n  node [fontname=\"Helvetica\" fontsize=10 style=filled fontcolor=white];\n  edge [fontname=\"Helvetica\" fontsize=8 fontcolor=\"#8b92a5\"];\n\n  \"Resinaro\" [label=\"Resinaro\" fillcolor=\"#ff6b35\" shape=box];\n  \"reviewer:SuspiciousUser1\" [label=\"SuspiciousUser1\" fillcolor=\"#ec4899\" shape=ellipse];\n  \"reviewer:SuspiciousUser2\" [label=\"SuspiciousUser2\" fillcolor=\"#ec4899\" shape=ellipse];\n  \"example-competitor.co.uk\" [label=\"example-competitor.co.uk\" fillcolor=\"#ff6b35\" shape=box];\n\n  \"reviewer:SuspiciousUser1\" -> \"Resinaro\" [style=dashed penwidth=1.5 color=\"#707e9a\"];\n  \"reviewer:SuspiciousUser2\" -> \"Resinaro\" [style=dashed penwidth=1.5 color=\"#707e9a\"];\n  \"reviewer:Maria P\" -> \"reviewer:SuspiciousUser1\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.869\"];\n  \"reviewer:Maria P\" -> \"reviewer:SuspiciousUser2\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.874\"];\n  \"reviewer:Maria P\" -> \"reviewer:SuspiciousUser3\" [style=dashed penwidth=2.5 color=\"#707e9a\" label=\"stylometry: 0.831\"];\n  \"reviewer:Maria P\" -> \"reviewer:James T\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.872\"];\n  \"reviewer:SuspiciousUser1\" -> \"reviewer:SuspiciousUser2\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.877\"];\n  \"reviewer:SuspiciousUser1\" -> \"reviewer:SuspiciousUser3\" [style=dashed penwidth=2.4 color=\"#707e9a\" label=\"stylometry: 0.800\"];\n  \"reviewer:SuspiciousUser1\" -> \"reviewer:James T\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.865\"];\n  \"reviewer:SuspiciousUser2\" -> \"reviewer:SuspiciousUser3\" [style=dashed penwidth=2.5 color=\"#707e9a\" label=\"stylometry: 0.820\"];\n  \"reviewer:SuspiciousUser2\" -> \"reviewer:James T\" [style=dashed penwidth=2.6 color=\"#707e9a\" label=\"stylometry: 0.865\"];\n  \"reviewer:SuspiciousUser3\" -> \"reviewer:James T\" [style=dashed penwidth=2.5 color=\"#707e9a\" label=\"stylometry: 0.823\"];\n  \"example-competitor.co.uk\" -> \"Resinaro\" [style=solid penwidth=1.5 color=\"#707e9a\" label=\"suspected competitor\"];\n}"
+}
