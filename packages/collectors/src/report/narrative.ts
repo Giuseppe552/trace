@@ -11,7 +11,7 @@
  */
 
 import type { InvestigationResult } from '../orchestrator.js'
-import { generateLegalBasis, checkAcpoCompliance } from '@trace/core'
+import { generateLegalBasis, checkAcpoCompliance, defaultErrorRates, formatErrorRates } from '@trace/core'
 
 export function generateReport(result: InvestigationResult): string {
   const lines: string[] = []
@@ -204,6 +204,9 @@ export function generateReport(result: InvestigationResult): string {
   lines.push('')
 
   // ── legal framework ───────────────────────────────────────
+  // ── error rates ────────────────────────────────────────────
+  lines.push(formatErrorRates(defaultErrorRates()))
+
   lines.push('## Applicable Law')
   lines.push('')
   lines.push('Evidence admissibility:')
