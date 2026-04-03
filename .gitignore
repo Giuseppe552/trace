@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.tsbuildinfo
+trace-evidence-*.json
+trace-report-*.md
+trace-evidence-*
+trace-report-*
+trace-graph-*
+CLAUDE.md

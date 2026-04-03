@@ -1,0 +1,21 @@
+{
+  "name": "@trace/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "trace": "./src/main.ts"
+  },
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "trace": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@trace/core": "file:../../packages/core",
+    "@trace/collectors": "file:../../packages/collectors"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
