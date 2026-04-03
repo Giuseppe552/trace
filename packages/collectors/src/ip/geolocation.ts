@@ -22,6 +22,7 @@
 import type { CollectorResult, Signal, FetchOptions } from '../types.js'
 import { fetchWithTimeout } from '../types.js'
 import { ipGeoReliability } from '../calibration.js'
+import { countryInfoGain, cityInfoGain, ipInfoGain as computeIpInfoGain, asnInfoGain } from '../information-gain.js'
 
 /** IP geolocation result */
 export interface IpGeoResult {
@@ -174,7 +175,7 @@ export async function lookupIp(
       confidence: data.isProxy ? 0.20 : 0.70,
       reliability: cityRel.value,
       reliabilityCitation: cityRel.cite,
-      informationBits: 8.0,
+      informationBits: cityInfoGain(data.city!, data.countryCode),
       rawData: `${data.city}, ${data.region}, ${data.country}`,
       sourceUrl: url,
     })
@@ -189,7 +190,7 @@ export async function lookupIp(
       confidence: 0.95,
       reliability: asnRel.value,
       reliabilityCitation: asnRel.cite,
-      informationBits: 2.0,
+      informationBits: data.asn ? asnInfoGain(data.asn) : 2.0,
       rawData: `AS${data.asn} ${data.asName}`,
       sourceUrl: url,
     })

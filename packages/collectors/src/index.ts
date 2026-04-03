@@ -1,4 +1,6 @@
 export * from './types.js'
+export * from './calibration.js'
+export * from './information-gain.js'
 export * from './ct/crtsh.js'
 export * from './dns/resolver.js'
 export * from './dns/age.js'

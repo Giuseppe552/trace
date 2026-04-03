@@ -16,6 +16,7 @@
 import { Resolver } from 'node:dns/promises'
 import type { CollectorResult, Signal } from '../types.js'
 import { CAL } from '../calibration.js'
+import { nameserverInfoGain } from '../information-gain.js'
 
 /** Structured DNS result */
 export interface DnsResult {
@@ -156,7 +157,7 @@ export async function collectDns(
       confidence: 0.9,
       reliability: CAL.DNS,
       reliabilityCitation: CAL.DNS_CITE,
-      informationBits: 2.0,
+      informationBits: nameserverInfoGain(data.ns),
       rawData: data.ns.join(', '),
       sourceUrl: url,
     })
