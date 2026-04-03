@@ -148,8 +148,52 @@ describe('compareWriteprints', () => {
   })
 
   it('different writing styles produce lower similarity', () => {
-    // technical security writing vs casual cooking instructions
     const result = compareWriteprints(SAMPLE_A, SAMPLE_B)
     expect(result.similarity).toBeLessThan(0.90)
+  })
+
+  it('reports confidence based on text length', () => {
+    const longComparison = compareWriteprints(SAMPLE_A, SAMPLE_A_VARIANT)
+    expect(longComparison.confidence).toBeGreaterThan(0)
+    expect(longComparison.minWordCount).toBeGreaterThan(0)
+  })
+
+  it('longer texts get higher confidence', () => {
+    const longResult = compareWriteprints(SAMPLE_A, SAMPLE_A_VARIANT) // ~90 words each
+    const shortA = 'Good service. Would use again.'
+    const shortB = 'Bad service. Would not use again.'
+    const shortResult = compareWriteprints(shortA, shortB) // ~6 words each
+    expect(longResult.confidence).toBeGreaterThan(shortResult.confidence)
+  })
+
+  it('short texts marked as insufficient', () => {
+    const result = compareWriteprints('Very short text.', 'Another short one.')
+    expect(result.reliability).toBe('insufficient')
+    expect(result.confidence).toBeLessThan(0.2)
+  })
+
+  it('confidence interval widens for short texts', () => {
+    const longResult = compareWriteprints(SAMPLE_A, SAMPLE_A_VARIANT)
+    const shortResult = compareWriteprints('Short review here.', 'Another brief one.')
+    const longWidth = longResult.confidenceInterval.upper - longResult.confidenceInterval.lower
+    const shortWidth = shortResult.confidenceInterval.upper - shortResult.confidenceInterval.lower
+    expect(shortWidth).toBeGreaterThan(longWidth)
+  })
+
+  it('confidence interval contains the similarity score', () => {
+    const result = compareWriteprints(SAMPLE_A, SAMPLE_B)
+    expect(result.confidenceInterval.lower).toBeLessThanOrEqual(result.similarity)
+    expect(result.confidenceInterval.upper).toBeGreaterThanOrEqual(result.similarity)
+  })
+
+  it('confidence interval bounds ∈ [0, 1]', () => {
+    const result = compareWriteprints(SAMPLE_A, SAMPLE_B)
+    expect(result.confidenceInterval.lower).toBeGreaterThanOrEqual(0)
+    expect(result.confidenceInterval.upper).toBeLessThanOrEqual(1)
+  })
+
+  it('reliability citation is non-empty', () => {
+    const result = compareWriteprints(SAMPLE_A, SAMPLE_B)
+    expect(result.reliabilityCitation.length).toBeGreaterThan(20)
   })
 })

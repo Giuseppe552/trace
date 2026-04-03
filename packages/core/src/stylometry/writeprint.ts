@@ -306,22 +306,108 @@ export function featureVector(f: StyleFeatures): number[] {
   ]
 }
 
-/**
- * Compare two text samples and return a similarity score.
- *
- * Combines:
- * - Cosine similarity of scalar feature vectors (60% weight)
- * - Character bigram overlap via Jensen-Shannon divergence (40% weight)
- *
- * Returns a score in [0, 1] where 1 = identical writing style.
- */
-export function compareWriteprints(textA: string, textB: string): {
+/** Result of a stylometric comparison */
+export interface StyleComparisonResult {
+  /** raw similarity score (0-1) */
   similarity: number
   scalarSimilarity: number
   bigramSimilarity: number
   featuresA: StyleFeatures
   featuresB: StyleFeatures
+  /**
+   * Confidence in this comparison (0-1).
+   * Degrades with shorter text. Based on:
+   * - Abbasi & Chen 2008: 94% at 100+ words
+   * - arXiv 2507.00838: 79-100% at ~100 words
+   * - arXiv 2003.11545: <48% with very short samples
+   * - PAN 2022: effectiveness deteriorates on shortest discourse types
+   */
+  confidence: number
+  /** minimum word count of the two texts */
+  minWordCount: number
+  /** assessment of whether this comparison is reliable enough to use */
+  reliability: 'high' | 'moderate' | 'low' | 'insufficient'
+  /** citation for the reliability assessment */
+  reliabilityCitation: string
+  /**
+   * Confidence interval around the similarity score.
+   * Wider interval = less reliable comparison.
+   * At 200+ words, interval is ±0.05.
+   * At 50 words, interval is ±0.20.
+   * Below 30 words, interval spans nearly the full [0,1] range.
+   */
+  confidenceInterval: { lower: number; upper: number }
+}
+
+/**
+ * Compute comparison reliability based on the shorter text.
+ *
+ * The shorter text is the bottleneck — you can't extract more
+ * features from a 30-word review than the 30 words allow,
+ * regardless of how long the reference sample is.
+ *
+ * Thresholds derived from:
+ * - 400+ words: "enough for open attribution" (Eder 2015)
+ * - 200+ words: high accuracy in most studies
+ * - 100-200 words: moderate, some features measurable
+ * - 50-100 words: low, high variance
+ * - <50 words: insufficient for meaningful attribution
+ */
+function assessReliability(minWords: number): {
+  confidence: number
+  reliability: StyleComparisonResult['reliability']
+  citation: string
+  marginOfError: number
 } {
+  if (minWords >= 400) {
+    return {
+      confidence: 0.85,
+      reliability: 'high',
+      citation: 'Eder (2015): 400 words sufficient for open attribution; Abbasi & Chen 2008: 94% at 100+ words with known authors',
+      marginOfError: 0.05,
+    }
+  }
+  if (minWords >= 200) {
+    return {
+      confidence: 0.75,
+      reliability: 'high',
+      citation: 'Abbasi & Chen 2008: high accuracy at 200+ words; multiple PAN shared task results confirm',
+      marginOfError: 0.08,
+    }
+  }
+  if (minWords >= 100) {
+    return {
+      confidence: 0.55,
+      reliability: 'moderate',
+      citation: 'arXiv 2507.00838 (2025): 79-100% on 10-sentence (~100 word) samples; accuracy begins to degrade',
+      marginOfError: 0.12,
+    }
+  }
+  if (minWords >= 50) {
+    return {
+      confidence: 0.30,
+      reliability: 'low',
+      citation: 'arXiv 2003.11545 (2020): <48% with limited training; PAN 2022: effectiveness deteriorates on shortest discourse types',
+      marginOfError: 0.20,
+    }
+  }
+  return {
+    confidence: 0.10,
+    reliability: 'insufficient',
+    citation: 'Literature consensus: texts below 50 words do not contain enough stylometric signal for attribution. Result should not be used.',
+    marginOfError: 0.40,
+  }
+}
+
+/**
+ * Compare two text samples and return a similarity score
+ * with confidence interval based on text length.
+ *
+ * Combines:
+ * - Cosine similarity of scalar feature vectors (60% weight)
+ * - Character bigram overlap via Jensen-Shannon divergence (40% weight)
+ */
+export function compareWriteprints(textA: string, textB: string): StyleComparisonResult {
   const featuresA = extractFeatures(textA)
   const featuresB = extractFeatures(textB)
 
@@ -329,7 +415,6 @@ export function compareWriteprints(textA: string, textB: string): {
   const vecB = featureVector(featuresB)
   const scalarSimilarity = cosineSimilarity(vecA, vecB)
 
-  // character bigram similarity via 1 - JSD
   const bigramSimilarity = 1 - jensenShannonDivergence(
     featuresA.charBigrams,
     featuresB.charBigrams,
@@ -337,7 +422,26 @@ export function compareWriteprints(textA: string, textB: string): {
 
   const similarity = 0.6 * scalarSimilarity + 0.4 * bigramSimilarity
 
-  return { similarity, scalarSimilarity, bigramSimilarity, featuresA, featuresB }
+  const minWordCount = Math.min(featuresA.wordCount, featuresB.wordCount)
+  const assessment = assessReliability(minWordCount)
+
+  const confidenceInterval = {
+    lower: Math.max(0, similarity - assessment.marginOfError),
+    upper: Math.min(1, similarity + assessment.marginOfError),
+  }
+
+  return {
+    similarity,
+    scalarSimilarity,
+    bigramSimilarity,
+    featuresA,
+    featuresB,
+    confidence: assessment.confidence,
+    minWordCount,
+    reliability: assessment.reliability,
+    reliabilityCitation: assessment.citation,
+    confidenceInterval,
+  }
 }
 
 /**
