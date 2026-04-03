@@ -1,11 +1,9 @@
 node_modules/
 dist/
 *.tsbuildinfo
-trace-evidence-*.json
-trace-report-*.md
+CLAUDE.md
 trace-evidence-*
 trace-report-*
 trace-graph-*
-CLAUDE.md
 trace-review-attack-*
 trace-monitor-*
