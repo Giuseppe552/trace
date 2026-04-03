@@ -21,6 +21,7 @@
  */
 
 import type { CollectorResult, Signal } from '../types.js'
+import { detectAiText } from '@trace/core'
 
 /** A single Google review */
 export interface GoogleReview {
@@ -161,6 +162,34 @@ export function analyzeReviews(
         flags,
         suspicionScore: Math.min(score, 1),
       })
+    }
+  }
+
+  // AI detection on suspicious reviews
+  for (const sr of suspiciousReviews) {
+    if (sr.review.text.length > 50) {
+      const aiResult = detectAiText(sr.review.text)
+      if (aiResult.verdict === 'likely_ai') {
+        sr.flags.push('likely_ai_generated')
+        sr.suspicionScore = Math.min(1, sr.suspicionScore + 0.3)
+      }
+    }
+  }
+
+  // also check all reviews for AI patterns (not just flagged ones)
+  for (const review of reviews) {
+    if (review.text.length > 75) {
+      const aiResult = detectAiText(review.text)
+      if (aiResult.verdict === 'likely_ai') {
+        const existing = suspiciousReviews.find(sr => sr.review === review)
+        if (!existing) {
+          suspiciousReviews.push({
+            review,
+            flags: ['likely_ai_generated'],
+            suspicionScore: 0.4,
+          })
+        }
+      }
     }
   }
 

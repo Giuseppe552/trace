@@ -40,6 +40,7 @@ import {
 import {
   compareWriteprints,
   detectCoordination,
+  detectAiText,
   POPULATION,
   toDot,
   toD3Json,
@@ -386,6 +387,23 @@ async function main() {
     }
 
     console.log(JSON.stringify(result.data, null, 2))
+  }
+
+  else if (command === 'ai') {
+    const file = args[1]
+    if (!file) { console.error('error: text file required'); process.exit(1) }
+
+    const text = await readFile(file, 'utf-8')
+    const result = detectAiText(text)
+
+    console.log(JSON.stringify({
+      verdict: result.verdict,
+      aiProbability: result.aiProbability,
+      confidence: result.confidence,
+      wordCount: result.wordCount,
+      triggers: result.triggers,
+      features: result.features,
+    }, null, 2))
   }
 
   else if (command === 'ip') {
