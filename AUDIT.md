@@ -41,13 +41,13 @@ Status: O = open, R = researching, B = building, D = done
 ## High (would be challenged by expert witness)
 
 ### 6. Stylometry not validated on short texts
-**Status:** O
+**Status:** D
 **Problem:** Writeprints (Abbasi & Chen 2008) achieved 94% accuracy on 100+ word samples with known authorship. Reviews are 20-80 words. The tool reports similarity scores but doesn't quantify how accuracy degrades with text length. A 0.72 similarity on 40-word texts means something very different from 0.72 on 400-word texts.
 **What needs to happen:** Research stylometric accuracy as a function of text length. Find papers that benchmark authorship attribution on short texts (tweets, reviews). Either: (a) build a calibration curve (length vs accuracy), (b) refuse to report scores below a minimum text length, or (c) report confidence intervals that widen with shorter texts.
 **Files affected:** `packages/core/src/stylometry/writeprint.ts`, `packages/core/tests/stylometry.test.ts`
 
 ### 7. AI detection thresholds are not empirically derived
-**Status:** O
+**Status:** D
 **Problem:** Thresholds like CV < 0.30 for "uniform sentence length" and hedging density > 0.3 are educated guesses. No dataset was used to derive them. No precision/recall measured. GPTZero's own research says detection is unreliable below 75 words and biased against non-native speakers.
 **What needs to happen:** Collect or find a labeled dataset of known AI-generated vs human-written reviews (multiple languages, multiple LLMs). Run the detector against it. Measure precision, recall, F1. Adjust thresholds to minimize false positives (a false accusation of AI usage is worse than missing a real AI review). Document the bias limitation for non-native English.
 **Files affected:** `packages/core/src/stylometry/ai-detection.ts`
