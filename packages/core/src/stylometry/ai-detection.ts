@@ -68,6 +68,21 @@ export interface AiDetectionResult {
   triggers: string[]
   /** word count of input */
   wordCount: number
+  /**
+   * IMPORTANT: this detector is NOT benchmarked against a labeled dataset.
+   * Thresholds are heuristic. Industry AI detectors (GPTZero, Originality.ai)
+   * use neural models and achieve 88-92% accuracy. This statistical detector
+   * is expected to perform significantly below those numbers.
+   *
+   * Known bias: non-native English speakers may score higher false positive
+   * rates because their writing can appear more "uniform" (lower burstiness).
+   * Source: GPTZero research — "detectors are biased against nonnative English speakers"
+   *
+   * For forensic purposes: an "likely_ai" verdict from this detector is an
+   * indicator for further investigation, NOT a determination. It should be
+   * combined with other signals (timing, reviewer profile, stylometry).
+   */
+  caveat: string
 }
 
 /** Hedging phrases characteristic of LLM output */
@@ -134,6 +149,7 @@ export function detectAiText(text: string): AiDetectionResult {
       features: emptyFeatures(),
       triggers: [],
       wordCount,
+      caveat: 'Text too short (<20 words) for any meaningful analysis.',
     }
   }
 
@@ -264,17 +280,30 @@ export function detectAiText(text: string): AiDetectionResult {
   const aiProbability = Math.min(1, aiScore / Math.max(totalWeight, 0.01))
 
   // confidence depends on text length
+  // GPTZero research: "short text is genuinely unreliable at under 75-100 words"
+  // Source: https://gptzero.me/news/how-ai-detectors-work/
+  // Our detector uses statistical features only (no neural model),
+  // so reliability is LOWER than GPTZero's reported numbers.
+  //
+  // Industry benchmarks (2025): GPTZero 88.7%, Originality.ai 92.3%
+  // Our statistical approach: estimated 60-70% on long texts (not benchmarked)
+  //
+  // These confidence values are UNCALIBRATED. No benchmark dataset has been
+  // run against this detector. They represent a conservative estimate of
+  // text-length-dependent reliability based on the GPTZero research.
   let confidence: number
-  if (wordCount < 50) confidence = 0.2
-  else if (wordCount < 75) confidence = 0.4
-  else if (wordCount < 150) confidence = 0.6
-  else if (wordCount < 300) confidence = 0.8
-  else confidence = 0.9
+  if (wordCount < 50) confidence = 0.15  // nearly useless
+  else if (wordCount < 75) confidence = 0.30  // GPTZero says unreliable here
+  else if (wordCount < 150) confidence = 0.50  // some signal, high uncertainty
+  else if (wordCount < 300) confidence = 0.65  // moderate, still below industry tools
+  else confidence = 0.75  // best case for statistical-only detection
 
-  // verdict
+  // verdict — conservative thresholds to minimize false accusations
+  // a false positive (accusing human text of being AI) is worse than
+  // a false negative (missing AI text) in a forensic context
   let verdict: AiDetectionResult['verdict']
   if (aiProbability >= 0.6 && confidence >= 0.4) verdict = 'likely_ai'
-  else if (aiProbability <= 0.3) verdict = 'likely_human'
+  else if (aiProbability <= 0.25) verdict = 'likely_human'
   else verdict = 'uncertain'
 
   return {
@@ -293,6 +322,7 @@ export function detectAiText(text: string): AiDetectionResult {
     },
     triggers,
     wordCount,
+    caveat: 'UNCALIBRATED. Statistical detector only (no neural model). Industry tools (GPTZero, Originality.ai) achieve 88-92% accuracy. This detector has not been benchmarked. Non-native English bias documented. Use as indicator for further investigation, not as determination.',
   }
 }
 
