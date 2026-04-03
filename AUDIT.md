@@ -26,10 +26,10 @@ Status: O = open, R = researching, B = building, D = done
 **Files changed:** New: `packages/core/src/benchmark/error-rates.ts`. Updated: report/narrative.ts, core/index.ts
 
 ### 4. Evidence chain is self-attested
-**Status:** O
-**Problem:** The SHA-256 chain proves data wasn't tampered with after capture. But it doesn't prove the data was real when captured. An attacker's solicitor says "the tool could have fabricated the DNS response before hashing it." No independent verification exists.
-**What needs to happen:** Research methods for independent evidence corroboration. Options: (a) archive.org timestamps as independent third party, (b) dual-source collection (query same record from two different resolvers and compare), (c) integration with Hunchly-style external evidence tools, (d) signed timestamps from a trusted third party (RFC 3161 timestamping authority).
-**Files affected:** `packages/core/src/evidence/chain.ts`, `packages/collectors/src/evidence/screenshot.ts`
+**Status:** D
+**Problem:** Evidence chain proved integrity but not authenticity of capture.
+**Resolution:** Created `evidence/verification.ts` with three independent verification methods: (1) Dual-source DNS — queries same record from Cloudflare (1.1.1.1) and Google (8.8.8.8), compares results, hashes combined output. Fabrication requires compromising both resolvers. (2) RFC 3161 timestamps — requests cryptographic timestamp from FreeTSA.org (independent TSA). Proves data hash existed at specific time. (3) Archive.org preservation — independent third-party capture. Each evidence entry can now have a `VerificationReport` with status: verified (2+ methods), partial (1), or unverified (0). 10 new tests including live dual-source DNS verification.
+**Files changed:** New: `packages/core/src/evidence/verification.ts`, `packages/core/tests/verification.test.ts`. Updated: core/index.ts
 
 ### 5. No error propagation
 **Status:** D
