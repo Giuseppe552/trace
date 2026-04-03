@@ -8,10 +8,10 @@ Status: O = open, R = researching, B = building, D = done
 ## Critical (would invalidate findings in court)
 
 ### 1. Reliability parameters not calibrated
-**Status:** O
-**Problem:** `LAYER_RELIABILITY` values (stylometry: 0.55, review_profile: 0.60, etc.) are estimated, not derived from empirical data. Every Dempster-Shafer fusion result depends on these being accurate. A forensic examiner asks "where did 0.55 come from?" and the answer is "I guessed."
-**What needs to happen:** Research published accuracy rates for each data source. WHOIS accuracy studies, stylometry accuracy on short texts (actual papers with error rates), CT log completeness studies, IP geolocation accuracy benchmarks. Derive each reliability parameter from cited data.
-**Files affected:** `packages/core/src/fusion/dempster-shafer.ts` (LAYER_RELIABILITY)
+**Status:** D
+**Problem:** `LAYER_RELIABILITY` values (stylometry: 0.55, review_profile: 0.60, etc.) were estimated, not derived from empirical data.
+**Resolution:** Replaced flat lookup with `CALIBRATED_RELIABILITY` — context-dependent values derived from: ICANN ARS Phase 2 Cycle 6 (2018), Li et al. CCS 2019 (CT completeness), MaxMind published accuracy, Abbasi & Chen ACM TOIS 2008 (stylometry), arXiv 2507.00838 / 2003.11545 (short text accuracy). Each Signal now carries its own `reliability` and `reliabilityCitation` set by the collector. Calibration constants centralized in `packages/collectors/src/calibration.ts`. Research documented in `research/001-reliability-calibration.md`.
+**Files changed:** `packages/core/src/fusion/dempster-shafer.ts`, `packages/collectors/src/calibration.ts`, `packages/collectors/src/types.ts`, whois/lookup.ts, ct/crtsh.ts, dns/resolver.ts, ip/geolocation.ts, orchestrator.ts
 
 ### 2. Information gain values are arbitrary
 **Status:** O
