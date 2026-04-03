@@ -44,13 +44,15 @@ const DOMAIN_C: DomainSignals = {
 }
 
 describe('correlateDomains', () => {
-  it('finds shared IP addresses', () => {
+  it('finds shared IP addresses with frequency-adjusted strength', () => {
     const result = correlateDomains([DOMAIN_A, DOMAIN_B])
     const ipCorrelation = result.correlations.find(c => c.attribute === 'ip_address')
     expect(ipCorrelation).toBeDefined()
     expect(ipCorrelation!.domains).toContain('competitor-agency.co.uk')
     expect(ipCorrelation!.domains).toContain('fake-review-site.com')
-    expect(ipCorrelation!.strength).toBe('definitive')
+    // 104.21.x.x is a Cloudflare IP range → correctly rated as weak
+    expect(ipCorrelation!.strength).toBe('weak')
+    expect(ipCorrelation!.informationBits).toBeLessThan(5) // CDN = low info
   })
 
   it('finds shared tracking IDs', () => {

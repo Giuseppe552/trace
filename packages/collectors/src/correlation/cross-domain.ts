@@ -19,6 +19,8 @@
  */
 
 import type { Signal } from '../types.js'
+import { nameserverInfoGain, ipInfoGain } from '../information-gain.js'
+import { CAL } from '../calibration.js'
 
 /** Signals from a single domain investigation */
 export interface DomainSignals {
@@ -68,23 +70,38 @@ export function correlateDomains(domainSignals: DomainSignals[]): CorrelationRes
   const correlations: Correlation[] = []
   const domains = domainSignals.map(d => d.domain)
 
-  // shared IPs
-  findShared(
+  // shared IPs — frequency-weighted
+  // CDN IPs (Cloudflare, AWS, etc.) shared by millions → near-zero signal
+  // Dedicated IPs → strong signal
+  findSharedWithFrequency(
     domainSignals,
     d => d.ips,
     'ip_address',
-    'definitive',
-    15.0,
+    (ip) => {
+      // check if this looks like a CDN IP (we can't do ASN lookup here
+      // without async, so use heuristic: known CDN IP ranges)
+      const isCdn = ip.startsWith('104.') || ip.startsWith('172.67.') || // Cloudflare
+        ip.startsWith('13.') || ip.startsWith('52.') || // AWS
+        ip.startsWith('34.') || ip.startsWith('35.') // Google Cloud
+      return isCdn
+        ? { strength: 'weak' as const, bits: 1.5 }
+        : { strength: 'strong' as const, bits: 19.5 }
+    },
     correlations,
   )
 
-  // shared nameservers
-  findShared(
+  // shared nameservers — frequency-weighted
+  // Cloudflare NS (20% market share) → 2.3 bits (weak)
+  // Custom NS → 10+ bits (strong)
+  findSharedWithFrequency(
     domainSignals,
     d => d.nameservers,
     'nameserver',
-    'moderate',
-    3.0,
+    (ns) => {
+      const bits = nameserverInfoGain([ns])
+      const strength: Correlation['strength'] = bits > 8 ? 'strong' : bits > 4 ? 'moderate' : 'weak'
+      return { strength, bits }
+    },
     correlations,
   )
 
@@ -243,6 +260,35 @@ function findShared(
   }
   for (const [value, doms] of valueMap) {
     if (doms.length > 1) {
+      out.push({ domains: [...new Set(doms)], attribute, value, strength, informationBits: bits })
+    }
+  }
+}
+
+/**
+ * Find shared values with frequency-dependent strength.
+ * Each shared value is scored by a function that considers
+ * how common that value is (e.g., Cloudflare NS = weak, custom NS = strong).
+ */
+function findSharedWithFrequency(
+  domainSignals: DomainSignals[],
+  extract: (d: DomainSignals) => string[],
+  attribute: string,
+  scoreValue: (value: string) => { strength: Correlation['strength']; bits: number },
+  out: Correlation[],
+) {
+  const valueMap = new Map<string, string[]>()
+  for (const ds of domainSignals) {
+    for (const val of extract(ds)) {
+      const key = val.toLowerCase().trim()
+      const list = valueMap.get(key) ?? []
+      list.push(ds.domain)
+      valueMap.set(key, list)
+    }
+  }
+  for (const [value, doms] of valueMap) {
+    if (doms.length > 1) {
+      const { strength, bits } = scoreValue(value)
       out.push({ domains: [...new Set(doms)], attribute, value, strength, informationBits: bits })
     }
   }
